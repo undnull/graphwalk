@@ -245,6 +245,7 @@ internal static class Program
             Console.WriteLine("back: {0} {1}", rib.A, rib.B);
         }
 
+        Console.WriteLine();
         while(L.Count < Points.Count) {
             if(!CollapseLog.TryDequeue(out Point? point))
                 break;
@@ -257,7 +258,13 @@ internal static class Program
         List<uint> joints = new List<uint>();
         foreach(KeyValuePair<uint, Point> it in Points) {
             if(Parents.TryGetValue(it.Key, out Point? parent)) {
-                if(!joints.Contains(parent.ID) && parent.ID != begin.ID && L[it.Key] >= Order[parent.ID]) {
+                if(!joints.Contains(parent.ID) && L[it.Key] >= Order[parent.ID]) {
+                    if(parent.ID == begin.ID && Parents.Count(r => r.Value.ID == parent.ID) <= 1) {
+                        // The root point is a joint only when
+                        // it has more than a single child rib.
+                        continue;
+                    }
+
                     Console.WriteLine("JOINT: {0}", parent.ID);
                     joints.Add(parent.ID);
                     continue;
